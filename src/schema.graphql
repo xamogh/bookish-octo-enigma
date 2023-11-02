@@ -16,9 +16,9 @@ input ChangePasswordInput {
   oldPassword: String!
 }
 
-input CreatePostInput {
-  content: String!
-  title: String!
+input CreateMemberInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 """
@@ -32,87 +32,45 @@ A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 scalar JWT
 
 input LoginInput {
-  email: String!
   password: String!
+  username: String!
+}
+
+type Member {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 type Mutation {
   changePassword(data: ChangePasswordInput!): User!
-  createPost(data: CreatePostInput!): Post!
+  createMember(createMemberInput: CreateMemberInput!): Member!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
-  signup(data: SignupInput!): Auth!
-  updateUser(data: UpdateUserInput!): User!
-}
-
-"""
-Possible directions in which to order a list of items when provided an `orderBy` argument.
-"""
-enum OrderDirection {
-  asc
-  desc
-}
-
-type PageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-}
-
-type Post {
-  author: User
-  content: String
-
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  id: ID!
-  published: Boolean!
-  title: String!
-
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
-}
-
-type PostConnection {
-  edges: [PostEdge!]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type PostEdge {
-  cursor: String!
-  node: Post!
-}
-
-input PostOrder {
-  direction: OrderDirection!
+  removeMember(id: Int!): Member!
+  requestResetPassword(data: ResetPasswordInitiateInput!): ResponseStatus!
+  updateMember(updateMemberInput: UpdateMemberInput!): Member!
 }
 
 type Query {
   hello(name: String!): String!
   helloWorld: String!
   me: User!
-  post: Post!
-  publishedPosts(orderBy: PostOrder, query: String): PostConnection!
-  userPosts: [Post!]!
+  member(id: Int!): Member!
+  members: [Member!]!
+}
+
+input ResetPasswordInitiateInput {
+  username: String!
+}
+
+type ResponseStatus {
+  status: Int!
 }
 
 """User role"""
 enum Role {
   ADMIN
   USER
-}
-
-input SignupInput {
-  email: String!
-  firstname: String
-  lastname: String
-  password: String!
-}
-
-type Subscription {
-  postCreated: Post!
 }
 
 type Token {
@@ -123,9 +81,10 @@ type Token {
   refreshToken: JWT!
 }
 
-input UpdateUserInput {
-  firstname: String
-  lastname: String
+input UpdateMemberInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }
 
 type User {
@@ -135,7 +94,6 @@ type User {
   firstname: String
   id: ID!
   lastname: String
-  posts: [Post!]
   role: Role!
 
   """Identifies the date and time when the object was last updated."""

@@ -12,27 +12,148 @@ generator dbml {
   provider = "prisma-dbml-generator"
 }
 
-model User {
-  id        String   @id @default(cuid())
+model PasswordToken {
+  id       Int      @id @default(autoincrement())
+  token    String
+  expireAt DateTime
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email     String   @unique
-  password  String
-  firstname String?
-  lastname  String?
-  posts     Post[]
-  role      Role
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
 }
 
-model Post {
-  id        String   @id @default(cuid())
+model User {
+  id Int @id @default(autoincrement())
+
+  username String @unique
+  password String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  published Boolean
-  title     String
-  content   String?
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  String?
+  isDeleted Boolean  @default(false)
+  createdBy String?
+  updatedBy String?
+  uniqueKey String?  @unique
+
+  role          Role
+  status        UserStatus     @default(VALIDATION_PENDING)
+  member        Member         @relation(fields: [memberId], references: [id])
+  memberId      Int            @unique
+  passwordToken PasswordToken?
+}
+
+model Member {
+  id Int @id @default(autoincrement())
+
+  firstName      String
+  lastName       String
+  isSanghaMember Boolean
+  active         Boolean @default(true)
+
+  sanghaJoinDate DateTime?
+  refugeName     String?
+  gender         GenderType?
+  yearOfBirth    Int?
+  memberShip     MembershipType?
+  email          String?
+  middleName     String?
+  title          String?
+  phoneMobile    String?
+  phoneLand      String?
+  phoneOther     String?
+  viberNumber    String?
+  note           String?
+  photo          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+  createdBy String?
+  updatedBy String?
+  uniqueKey String?  @unique
+
+  user   User?
+  groups Group[]
+
+  currentAddress     Address? @relation(name: "currentAddress", fields: [currentAddressId], references: [id])
+  currentAddressId   Int?     @unique
+  permanentAddress   Address? @relation(name: "permanentAddress", fields: [permanentAddressId], references: [id])
+  permanentAddressId Int?     @unique
+  address            Address? @relation(fields: [addressId], references: [id])
+  addressId          Int?
+  centre             Centre?  @relation(fields: [centreId], references: [id])
+  centreId           Int?
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+
+  street        String?
+  city          String?
+  stateProvince String?
+  country       String
+
+  membersCurrentAddress   Member? @relation(name: "currentAddress")
+  membersPermanentAddress Member? @relation(name: "permanentAddress")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  uniqueKey String?  @unique
+  updatedBy String?
+  createdBy String?
+
+  members  Member[]
+  memberId Int?
+}
+
+model Centre {
+  id Int @id @default(autoincrement())
+
+  name            String  @unique
+  displayText     String
+  displaySequence Int
+  streetAddress   String?
+  city            String?
+  stateProvince   String?
+  country         String?
+
+  members Member[]
+}
+
+model Group {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  visible     Boolean
+
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  uniqueKey String?  @unique
+  updatedBy String?
+  createdBy String?
+
+  members Member[]
+}
+
+enum GenderType {
+  Male
+  Female
+  Other
+}
+
+enum MembershipType {
+  LifeMember
+  HonoraryMember
+  BoardMember
+  GeneralMember
+}
+
+enum UserStatus {
+  VALIDATED
+  VALIDATION_PENDING
 }
 
 enum Role {

@@ -2,27 +2,135 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
-Table User {
-  id String [pk]
+Table PasswordToken {
+  id Int [pk, increment]
+  token String [not null]
+  expireAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  email String [unique, not null]
-  password String [not null]
-  firstname String
-  lastname String
-  posts Post [not null]
-  role Role [not null]
+  user User [not null]
+  userId Int [unique, not null]
 }
 
-Table Post {
-  id String [pk]
+Table User {
+  id Int [pk, increment]
+  username String [unique, not null]
+  password String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  published Boolean [not null]
-  title String [not null]
-  content String
-  author User
-  authorId String
+  isDeleted Boolean [not null, default: false]
+  createdBy String
+  updatedBy String
+  uniqueKey String [unique]
+  role Role [not null]
+  status UserStatus [not null, default: 'VALIDATION_PENDING']
+  member Member [not null]
+  memberId Int [unique, not null]
+  passwordToken PasswordToken
+}
+
+Table Member {
+  id Int [pk, increment]
+  firstName String [not null]
+  lastName String [not null]
+  isSanghaMember Boolean [not null]
+  active Boolean [not null, default: true]
+  sanghaJoinDate DateTime
+  refugeName String
+  gender GenderType
+  yearOfBirth Int
+  memberShip MembershipType
+  email String
+  middleName String
+  title String
+  phoneMobile String
+  phoneLand String
+  phoneOther String
+  viberNumber String
+  note String
+  photo String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  isDeleted Boolean [not null, default: false]
+  createdBy String
+  updatedBy String
+  uniqueKey String [unique]
+  user User
+  groups Group [not null]
+  currentAddress Address
+  currentAddressId Int [unique]
+  permanentAddress Address
+  permanentAddressId Int [unique]
+  address Address
+  addressId Int
+  centre Centre
+  centreId Int
+}
+
+Table Address {
+  id Int [pk, increment]
+  street String
+  city String
+  stateProvince String
+  country String [not null]
+  membersCurrentAddress Member
+  membersPermanentAddress Member
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  uniqueKey String [unique]
+  updatedBy String
+  createdBy String
+  members Member [not null]
+  memberId Int
+}
+
+Table Centre {
+  id Int [pk, increment]
+  name String [unique, not null]
+  displayText String [not null]
+  displaySequence Int [not null]
+  streetAddress String
+  city String
+  stateProvince String
+  country String
+  members Member [not null]
+}
+
+Table Group {
+  id Int [pk, increment]
+  name String [not null]
+  description String [not null]
+  visible Boolean [not null]
+  isDeleted Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  uniqueKey String [unique]
+  updatedBy String
+  createdBy String
+  members Member [not null]
+}
+
+Table GroupToMember {
+  groupsId Int [ref: > Group.id]
+  membersId Int [ref: > Member.id]
+}
+
+Enum GenderType {
+  Male
+  Female
+  Other
+}
+
+Enum MembershipType {
+  LifeMember
+  HonoraryMember
+  BoardMember
+  GeneralMember
+}
+
+Enum UserStatus {
+  VALIDATED
+  VALIDATION_PENDING
 }
 
 Enum Role {
@@ -30,4 +138,14 @@ Enum Role {
   USER
 }
 
-Ref: Post.authorId > User.id
+Ref: PasswordToken.userId - User.id
+
+Ref: User.memberId - Member.id
+
+Ref: Member.currentAddressId - Address.id
+
+Ref: Member.permanentAddressId - Address.id
+
+Ref: Member.addressId - Address.id
+
+Ref: Member.centreId > Centre.id

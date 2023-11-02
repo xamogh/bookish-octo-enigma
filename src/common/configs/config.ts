@@ -19,11 +19,16 @@ const config: Config = {
     debug: true,
     schemaDestination: './src/schema.graphql',
     sortSchema: true,
+    globalPrefix: 'api',
   },
   security: {
     expiresIn: '2m',
     refreshIn: '7d',
     bcryptSaltOrRound: 10,
+  },
+  email: {
+    from: process.env.EMAIL_USER ?? 'xamoghx@gmail.com',
+    connectionString: process.env.CONNECTION_STRING ?? 'awerawerafawefawef',
   },
 };
 
